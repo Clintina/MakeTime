@@ -1,0 +1,15 @@
+<h2>What do you want to make time for?</h2>
+<form method="post">
+  {% csrf_token %}
+  {{ formset.management_form }}
+  {% for form in formset %}
+    <div style="margin-bottom: 20px;">
+      {{ form.category.label_tag }} {{ form.category }}
+      {{ form.label.label_tag }} {{ form.label }}
+      {{ form.contact_name.label_tag }} {{ form.contact_name }}
+      {{ form.contact_email.label_tag }} {{ form.contact_email }}
+      {{ form.DELETE }} Delete
+    </div>
+  {% endfor %}
+  <button type="submit">Continue</button>
+</form>

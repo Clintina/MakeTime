@@ -1,0 +1,7 @@
+<!-- onboarding.html -->
+<h2>Let’s Make Time for What Matters</h2>
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">Continue</button>
+</form>
