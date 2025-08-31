@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from datetime import datetime, timedelta
 
 class Tag(models.Model):
     name = models.CharField(max_length=50)
@@ -53,3 +54,13 @@ class MakeTimeItem(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.category}: {self.label}"
+
+def generate_time_blocks(start, end):
+    blocks = []
+    current = datetime.combine(datetime.today(), start)
+    end_time = datetime.combine(datetime.today(), end)
+    while current < end_time:
+        next_block = current + timedelta(hours=1)
+        blocks.append(current.strftime('%I:%M %p') + ' - ' + next_block.strftime('%I:%M %p'))
+        current = next_block
+    return blocks

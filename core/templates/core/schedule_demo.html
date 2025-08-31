@@ -1,2 +1,18 @@
-<h2>Schedule Demo</h2>
-<p>This page will show your time blocks and color-coded schedule.</p>
+{% extends "core/base.html" %}
+{% block content %}
+<h1>Schedule Page Loaded</h1>
+<h2>Your Daily Schedule</h2>
+<table class="table table-bordered">
+  <thead>
+    <tr><th>Time</th><th>Activity</th></tr>
+  </thead>
+  <tbody>
+    {% for time, activity in schedule.items %}
+      <tr>
+        <td>{{ time }}</td>
+        <td class="bg-light">{{ activity }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

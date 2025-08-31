@@ -1,8 +1,8 @@
 from django import forms
 from .models import Profile
 from .models import MakeTimeItem
-from .models import MakeTimeItem
 from django.forms import modelformset_factory
+from .models import MakeTimeItem
 
 class ProfileForm(forms.ModelForm):
     class Meta:
@@ -14,9 +14,10 @@ class MakeTimeItemForm(forms.ModelForm):
         model = MakeTimeItem
         fields = ['category', 'label', 'contact_name', 'phone_number']
 
-MakeTimeFormSet = modelformset_factory(
-    MakeTimeItem,
-    form=MakeTimeItemForm,
-    extra=3,
-    can_delete=True
-)
+class TimeForm(forms.ModelForm):
+    class Meta:
+        model = MakeTimeItem
+        fields = ['category', 'label', 'contact_name', 'phone_number']
+
+
+

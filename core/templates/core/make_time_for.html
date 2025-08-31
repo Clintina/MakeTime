@@ -1,6 +1,6 @@
 <h2>What do you want to make time for?</h2>
 
-<form method="post">
+<form method="post" action="{% url 'make_time_for' %}">
   {% csrf_token %}
   {{ formset.management_form }}
   {% for form in formset %}
