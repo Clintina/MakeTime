@@ -1,18 +1,98 @@
-{% extends "core/base.html" %}
+{% extends 'base.html' %}
+{% load static %}
+
 {% block content %}
-<h1>Schedule Page Loaded</h1>
-<h2>Your Daily Schedule</h2>
-<table class="table table-bordered">
-  <thead>
-    <tr><th>Time</th><th>Activity</th></tr>
-  </thead>
-  <tbody>
-    {% for time, activity in schedule.items %}
-      <tr>
-        <td>{{ time }}</td>
-        <td class="bg-light">{{ activity }}</td>
-      </tr>
-    {% endfor %}
-  </tbody>
-</table>
+<div class="container">
+  <h2 class="title">Make Time For</h2>
+
+  <!-- Show non-formset errors -->
+  {% if formset.non_form_errors %}
+    <ul class="errorlist">
+      {% for error in formset.non_form_errors %}
+        <li>{{ error }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  <form method="post">
+    {% csrf_token %}
+    <div id="formset-container">
+      {% for form in formset %}
+        <div class="form-block">
+          {{ form.errors }}
+          {{ form.as_p }}
+        </div>
+      {% endfor %}
+    </div>
+
+    <button type="button" id="add-form-btn">Add More</button>
+    <button type="submit">Save</button>
+  </form>
+</div>
+
+<style>
+  body {
+    background: linear-gradient(to right, #6a11cb, #2575fc);
+    font-family: 'Poppins', sans-serif;
+    color: #fff;
+    text-align: center;
+    padding: 2rem;
+  }
+
+  .container {
+    max-width: 700px;
+    margin: auto;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+  }
+
+  .title {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .form-block {
+    margin-bottom: 1rem;
+    text-align: left;
+  }
+
+  .errorlist {
+    color: #ffdddd;
+    background-color: #660000;
+    padding: 0.5rem;
+    border-radius: 6px;
+    list-style: none;
+  }
+
+  button {
+    margin: 1rem 0.5rem;
+    padding: 0.6rem 1.2rem;
+    border: none;
+    border-radius: 6px;
+    background-color: #ffffff;
+    color: #2575fc;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  button:hover {
+    background-color: #f0f0f0;
+  }
+</style>
+
+<script>
+  document.getElementById('add-form-btn').addEventListener('click', function () {
+    const container = document.getElementById('formset-container');
+    const totalForms = document.querySelector('[name="form-TOTAL_FORMS"]');
+    const currentCount = parseInt(totalForms.value);
+    const newForm = container.children[0].cloneNode(true);
+
+    // Update form index
+    newForm.innerHTML = newForm.innerHTML.replace(/form-(\d+)/g, `form-${currentCount}`);
+    container.appendChild(newForm);
+    totalForms.value = currentCount + 1;
+  });
+</script>
 {% endblock %}

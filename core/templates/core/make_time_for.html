@@ -1,37 +1,48 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block content %}
 <h2>What do you want to make time for?</h2>
+<link rel="stylesheet" href="{% static 'core/styles.css' %}">
 
 <form method="post" action="{% url 'make_time_for' %}">
   {% csrf_token %}
   {{ formset.management_form }}
-  {% for form in formset %}
-    <div class="form-block" style="margin-bottom: 20px;">
-      {{ form.id }} 
-      {{ form.category.label_tag }} {{ form.category }}
-      {{ form.label.label_tag }} {{ form.label }}
 
-      <div class="person-fields" style="display: none;">
-        <label for="{{ form.contact_name.id_for_label }}">Person's Name:</label>
-        {{ form.contact_name }}
-        <label for="{{ form.phone_number.id_for_label }}">Phone Number:</label>
-        {{ form.phone_number }}
+  <div id="formset-container">
+    {% for form in formset %}
+      <div class="form-block" style="margin-bottom: 20px;">
+        {{ form.id }}
+        {{ form.category.label_tag }} {{ form.category }}
+        {{ form.label.label_tag }} {{ form.label }}
+
+        <div class="person-fields" style="display: none;">
+          <label for="{{ form.contact_name.id_for_label }}">Person's Name:</label>
+          {{ form.contact_name }}
+          <label for="{{ form.phone_number.id_for_label }}">Phone Number:</label>
+          {{ form.phone_number }}
+        </div>
+
+        <div class="other-fields" style="display: none;">
+          <label for="color-{{ forloop.counter }}">Color:</label>
+          <input type="color" name="color-{{ forloop.counter }}" id="color-{{ forloop.counter }}">
+        </div>
+
+        {{ form.DELETE }} Delete
       </div>
+    {% endfor %}
+  </div>
 
-      <div class="other-fields" style="display: none;">
-        <label for="color-{{ forloop.counter }}">Color:</label>
-        <input type="color" name="color-{{ forloop.counter }}" id="color-{{ forloop.counter }}">
-      </div>
-
-      {{ form.DELETE }} Delete
-    </div>
-  {% endfor %}
+  <button type="button" id="add-more">Add More</button>
   <button type="submit">Continue</button>
 </form>
 
 <script>
   document.addEventListener("DOMContentLoaded", function () {
-    const blocks = document.querySelectorAll(".form-block");
+    const formsetContainer = document.getElementById("formset-container");
+    const addMoreBtn = document.getElementById("add-more");
+    const totalForms = document.querySelector("#id_form-TOTAL_FORMS");
 
-    blocks.forEach(block => {
+    function initializeBlock(block) {
       const categorySelect = block.querySelector("select");
       const personFields = block.querySelector(".person-fields");
       const otherFields = block.querySelector(".other-fields");
@@ -48,7 +59,23 @@
       }
 
       categorySelect.addEventListener("change", toggleFields);
-      toggleFields(); // initialize on load
+      toggleFields();
+    }
+
+    // Initialize existing blocks
+    document.querySelectorAll(".form-block").forEach(initializeBlock);
+
+    addMoreBtn.addEventListener("click", function () {
+      const currentCount = parseInt(totalForms.value);
+      const newBlock = formsetContainer.children[0].cloneNode(true);
+
+      // Update form index in HTML
+      newBlock.innerHTML = newBlock.innerHTML.replace(/form-(\d+)/g, `form-${currentCount}`);
+      formsetContainer.appendChild(newBlock);
+      totalForms.value = currentCount + 1;
+
+      initializeBlock(newBlock);
     });
   });
 </script>
+{% endblock %}

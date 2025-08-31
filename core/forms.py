@@ -14,10 +14,22 @@ class MakeTimeItemForm(forms.ModelForm):
         model = MakeTimeItem
         fields = ['category', 'label', 'contact_name', 'phone_number']
 
+MakeTimeItemFormSet = modelformset_factory(
+    MakeTimeItem,
+    form=MakeTimeItemForm,
+    extra=1,
+    can_delete=True)
+
 class TimeForm(forms.ModelForm):
     class Meta:
         model = MakeTimeItem
         fields = ['category', 'label', 'contact_name', 'phone_number']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.required = False
+
 
 
 

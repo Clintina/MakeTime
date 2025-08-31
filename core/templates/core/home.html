@@ -1,5 +1,6 @@
-<h1>Welcome to Make Time</h1>
-<p>Helping you prioritize what matters most.</p>
-
-<a href="{% url 'signup' %}">Sign Up</a> |
-<a href="{% url 'login' %}">Log In</a>
+{% extends 'core/base.html' %}
+{% block content %}
+  <h2>Welcome to MakeTime!</h2>
+  <p>Helping you prioritize what matters most.</p>
+  <a href="{% url 'login' %}">Login</a> | <a href="{% url 'signup' %}">Sign Up</a>
+{% endblock %}
