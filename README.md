@@ -37,9 +37,13 @@
 
 ---
 
-## 🚀 Getting Started
+## 🚧 Project Status
 
-1. Clone the repo:
-   ```bash
-   git clone https://github.com/Clintina/MakeTime.git
-   cd MakeTime
+This is an early-stage prototype and not a finalized product.
+MakeTime represents the vision for a fully realized time management tool — one that helps users prioritize what matters most through intuitive scheduling and thoughtful design.
+
+Current features demonstrate core functionality and UI direction, but the app is still under active development.
+Expect ongoing changes, refinements, and new features as the project evolves toward its end goal.
+
+This project is a reflection of both technical growth and creative intention.
+It’s not perfect yet — but it’s getting closer with every commit.
