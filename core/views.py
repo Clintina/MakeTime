@@ -7,6 +7,8 @@ from datetime import datetime, timedelta
 from .forms import ProfileForm, TimeForm
 from .models import Profile, MakeTimeItem
 from django.contrib import messages
+from .forms import MakeTimeItemFormSet
+
 
 @login_required
 def onboarding_view(request):
@@ -40,6 +42,7 @@ def make_time_for_view(request):
         if formset.is_valid():
             print("✅ Formset is valid")
             items = []
+            saved_ids = []
 
             for i, form in enumerate(formset):
                 if form.cleaned_data and not form.cleaned_data.get('DELETE', False):
@@ -48,6 +51,7 @@ def make_time_for_view(request):
                         entry.user = request.user
                         entry.save()
                         items.append(entry.label)
+                        saved_ids.append(entry.id)
                         print(f"✔️ Saved item {i}: {entry.label}")
                     except Exception as e:
                         print(f"❗ Error saving item {i}: {e}")
@@ -67,12 +71,14 @@ def make_time_for_view(request):
                 print("📋 Schedule assigned:", schedule)
 
                 if not schedule:
-                    messages.warning(request, "Schedule could not be generated. Try adding more items or adjusting your time range.")
-                    return redirect('make_time_for')
+                    messages.warning(request, "No schedule was generated, but you can still edit or add items.")
+                    request.session['schedule'] = {}
+                    return redirect('schedule_demo')
 
                 request.session['schedule'] = schedule
+                request.session['saved_item_ids'] = saved_ids  # ✅ Save IDs for future access
+                
                 print("📦 Schedule saved to session")
-
                 return redirect('schedule_demo')
 
             except Exception as e:
@@ -88,12 +94,49 @@ def make_time_for_view(request):
             messages.error(request, "Please fix the errors in the form.")
 
     return render(request, 'core/make_time_for.html', {'formset': formset})
+
 @login_required
 def schedule_demo_view(request):
-    schedule = request.session.get('schedule')
-    if not schedule:
-        return redirect('make_time_for')  # fallback if session is empty
-    return render(request, 'core/schedule_demo.html', {'schedule': schedule})
+    saved_ids = request.session.get('saved_item_ids', [])
+    schedule = request.session.get('schedule', {})
+
+    existing_items = MakeTimeItem.objects.filter(id__in=saved_ids)
+    profile = request.user.profile
+
+    if request.method == 'POST':
+        formset = MakeTimeItemFormSet(request.POST, queryset=existing_items)
+        if formset.is_valid():
+            instances = formset.save(commit=False)
+            new_ids = []
+
+            for instance in instances:
+                instance.user = request.user
+                instance.save()
+                new_ids.append(instance.id)
+
+            for obj in formset.deleted_objects:
+                obj.delete()
+
+            request.session['saved_item_ids'] = new_ids
+
+            # ✅ REGENERATE SCHEDULE HERE
+            updated_items = MakeTimeItem.objects.filter(id__in=new_ids)
+            labels = [item.label for item in updated_items if item.label]
+            blocks = generate_time_blocks(profile.free_time_start, profile.free_time_end)
+            schedule = assign_items_to_blocks(blocks, labels)
+            request.session['schedule'] = schedule
+
+            return redirect('schedule_demo')
+
+    else:
+        formset = MakeTimeItemFormSet(queryset=existing_items)
+
+    return render(request, 'core/schedule_demo.html', {
+        'formset': formset,
+        'schedule': schedule,
+        'profile': profile
+    })
+
 
 
 def signup_view(request):
@@ -125,9 +168,12 @@ def assign_items_to_blocks(blocks, items):
 
 def home_view(request):
     if request.user.is_authenticated:
-        profile = getattr(request.user, 'profile', None)
-        if profile and profile.occupation and profile.time_commitment and profile.free_time_start and profile.free_time_end:
+        if request.session.get('saved_item_ids'):
             return redirect('schedule_demo')
         else:
-            return redirect('onboarding')
+            return redirect('make_time_for')
     return render(request, 'core/home.html')
+
+def goodbye_view(request):
+    return render(request, 'core/goodbye.html')
+

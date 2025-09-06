@@ -1,0 +1,46 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="container">
+  <h2 class="title">See You Soon 👋</h2>
+  <p class="subtitle">Thanks for spending time with your planner today.</p>
+  <a href="{% url 'login' %}" class="login-link">Log in again</a>
+</div>
+
+<style>
+  .container {
+    max-width: 600px;
+    margin: auto;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    text-align: center;
+  }
+
+  .title {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: #fff;
+  }
+
+  .subtitle {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+    color: #e0e0ff;
+  }
+
+  .login-link {
+    display: inline-block;
+    padding: 0.6rem 1.2rem;
+    background-color: #ffffff;
+    color: #2575fc;
+    font-weight: bold;
+    border-radius: 6px;
+    text-decoration: none;
+  }
+
+  .login-link:hover {
+    background-color: #f0f0f0;
+  }
+</style>
+{% endblock %}

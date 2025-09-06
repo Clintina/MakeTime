@@ -1,32 +1,90 @@
-{% extends 'base.html' %}
+{% extends 'core/base.html' %}
 {% load static %}
 
 {% block content %}
 <div class="container">
-  <h2 class="title">Make Time For</h2>
+  <h2 class="title">Your Daily Schedule</h2>
 
-  <!-- Show non-formset errors -->
-  {% if formset.non_form_errors %}
-    <ul class="errorlist">
-      {% for error in formset.non_form_errors %}
-        <li>{{ error }}</li>
-      {% endfor %}
-    </ul>
+  {% if profile %}
+    <p class="subtitle">
+      Available from {{ profile.free_time_start|time:"H:i" }} to {{ profile.free_time_end|time:"H:i" }}
+    </p>
   {% endif %}
 
+  {% if schedule %}
+    <table class="planner-table">
+      <thead>
+        <tr>
+          <th>Time</th>
+          <th>Activity</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for time, activity in schedule.items %}
+          <tr>
+            <td>{{ time }}</td>
+            <td>{{ activity }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>No schedule generated yet. Add items below to begin planning.</p>
+  {% endif %}
+
+  <h3>Edit Your Schedule</h3>
   <form method="post">
     {% csrf_token %}
+    {{ formset.management_form }}
+
     <div id="formset-container">
       {% for form in formset %}
-        <div class="form-block">
-          {{ form.errors }}
-          {{ form.as_p }}
+        <div class="form-row">
+          <div class="form-group">
+            {{ form.category.label_tag }}
+            {{ form.category }}
+          </div>
+
+          <div class="form-group">
+            {{ form.label.label_tag }}
+            {{ form.label }}
+          </div>
+
+          <div class="form-group person-fields">
+            {{ form.contact_name.label_tag }}
+            {{ form.contact_name }}
+          </div>
+
+          <div class="form-group person-fields">
+            {{ form.phone_number.label_tag }}
+            {{ form.phone_number }}
+          </div>
+
+          <div class="form-group">
+            <label>Delete</label>
+            {{ form.DELETE }}
+          </div>
         </div>
       {% endfor %}
     </div>
 
     <button type="button" id="add-form-btn">Add More</button>
-    <button type="submit">Save</button>
+    <button type="submit">Save & Regenerate</button>
+  </form>
+
+  {% if messages %}
+    <div class="footer-message">
+      <ul class="messages">
+        {% for message in messages %}
+          <li>{{ message }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  <form method="post" action="{% url 'logout' %}" class="logout-form">
+    {% csrf_token %}
+    <button type="submit" class="logout-btn">Log Out</button>
   </form>
 </div>
 
@@ -40,7 +98,7 @@
   }
 
   .container {
-    max-width: 700px;
+    max-width: 900px;
     margin: auto;
     background: rgba(255, 255, 255, 0.1);
     padding: 2rem;
@@ -50,20 +108,116 @@
 
   .title {
     font-size: 2rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .subtitle {
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+    color: #e0e0ff;
+  }
+
+  .planner-table {
+    width: 100%;
+    border-collapse: collapse;
     margin-bottom: 1.5rem;
   }
 
-  .form-block {
-    margin-bottom: 1rem;
-    text-align: left;
+  .planner-table th, .planner-table td {
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 0.5rem;
+    text-align: center;
   }
 
-  .errorlist {
-    color: #ffdddd;
-    background-color: #660000;
-    padding: 0.5rem;
+  .planner-table th {
+    background-color: rgba(255, 255, 255, 0.2);
+    font-weight: bold;
+  }
+
+  .planner-table tr:nth-child(even) {
+    background-color: rgba(255, 255, 255, 0.05);
+  }
+
+  .form-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.2rem;
+    justify-content: space-between;
+    align-items: flex-start;
+    background-color: rgba(255, 255, 255, 0.05);
+    padding: 1rem;
+    border-radius: 8px;
+  }
+
+  .form-group {
+    flex: 1 1 180px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .form-group label {
+    font-weight: bold;
+    margin-bottom: 0.3rem;
+    color: #fff;
+  }
+
+  input, select {
+    width: 100%;
+    padding: 0.4rem;
     border-radius: 6px;
+    border: none;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  input[type="checkbox"] {
+    transform: scale(1.2);
+    margin-top: 0.5rem;
+  }
+
+  .person-fields {
+    display: none;
+  }
+
+  .messages {
     list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .footer-message {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .footer-message .messages li {
+    background-color: rgba(0, 0, 0, 0.3);
+    padding: 0.6rem;
+    border-radius: 6px;
+    color: #fff;
+    font-weight: bold;
+    font-size: 1rem;
+  }
+
+  .logout-form {
+    margin-top: 2rem;
+    text-align: center;
+  }
+
+  .logout-btn {
+    background-color: transparent;
+    border: 2px solid #fff;
+    color: #fff;
+    padding: 0.6rem 1.4rem;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  .logout-btn:hover {
+    background-color: rgba(255, 255, 255, 0.2);
   }
 
   button {
@@ -83,16 +237,37 @@
 </style>
 
 <script>
-  document.getElementById('add-form-btn').addEventListener('click', function () {
-    const container = document.getElementById('formset-container');
-    const totalForms = document.querySelector('[name="form-TOTAL_FORMS"]');
-    const currentCount = parseInt(totalForms.value);
-    const newForm = container.children[0].cloneNode(true);
+  document.addEventListener("DOMContentLoaded", function () {
+    function initializeBlock(block) {
+      const categorySelect = block.querySelector("select");
+      const personFields = block.querySelectorAll(".person-fields");
 
-    // Update form index
-    newForm.innerHTML = newForm.innerHTML.replace(/form-(\d+)/g, `form-${currentCount}`);
-    container.appendChild(newForm);
-    totalForms.value = currentCount + 1;
+      function toggleFields() {
+        const value = categorySelect.value.trim().toLowerCase();
+        const show = value === "person";
+        personFields.forEach(field => {
+          field.style.display = show ? "flex" : "none";
+        });
+      }
+
+      categorySelect.addEventListener("change", toggleFields);
+      toggleFields();
+    }
+
+    document.querySelectorAll(".form-row").forEach(initializeBlock);
+
+    document.getElementById('add-form-btn').addEventListener('click', function () {
+      const container = document.getElementById('formset-container');
+      const totalForms = document.querySelector('[name="form-TOTAL_FORMS"]');
+      const currentCount = parseInt(totalForms.value);
+      const newRow = container.children[0].cloneNode(true);
+
+      newRow.innerHTML = newRow.innerHTML.replace(/form-(\d+)/g, `form-${currentCount}`);
+      container.appendChild(newRow);
+      totalForms.value = currentCount + 1;
+
+      initializeBlock(newRow);
+    });
   });
 </script>
 {% endblock %}

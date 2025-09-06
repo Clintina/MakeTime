@@ -1,6 +1,57 @@
 {% extends 'core/base.html' %}
 {% block content %}
-  <h2>Welcome to MakeTime!</h2>
-  <p>Helping you prioritize what matters most.</p>
-  <a href="{% url 'login' %}">Login</a> | <a href="{% url 'signup' %}">Sign Up</a>
+<div class="home-container">
+  <h1 class="home-title">Welcome to MakeTime!</h1>
+  <p class="home-subtitle">Helping you prioritize what matters most.</p>
+
+  <div class="button-group">
+    <a href="{% url 'login' %}" class="home-btn">Login</a>
+    <a href="{% url 'signup' %}" class="home-btn">Sign Up</a>
+  </div>
+</div>
+
+<style>
+  .home-container {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #fff;
+  }
+
+  .home-title {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    font-weight: bold;
+  }
+
+  .home-subtitle {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+    color: #e0e0ff;
+  }
+
+  .button-group {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .home-btn {
+    background: linear-gradient(to right, #6a11cb, #2575fc);
+    color: #fff;
+    font-family: 'Poppins', sans-serif;
+    font-weight: bold;
+    padding: 0.8rem 1.6rem;
+    border: none;
+    border-radius: 8px;
+    text-decoration: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .home-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+  }
+</style>
 {% endblock %}

@@ -1,5 +1,6 @@
 {% extends 'core/base.html' %}
 {% load static %}
+
 {% block content %}
 <h2>What do you want to make time for?</h2>
 <link rel="stylesheet" href="{% static 'core/styles.css' %}">
@@ -48,9 +49,12 @@
       const otherFields = block.querySelector(".other-fields");
 
       function toggleFields() {
-        const value = categorySelect.value;
+        const value = categorySelect.value.trim().toLowerCase();
         if (value === "person") {
           personFields.style.display = "block";
+          otherFields.style.display = "none";
+        } else if (value === "" || value === "---------") {
+          personFields.style.display = "none";
           otherFields.style.display = "none";
         } else {
           personFields.style.display = "none";
@@ -59,22 +63,21 @@
       }
 
       categorySelect.addEventListener("change", toggleFields);
-      toggleFields();
+      toggleFields(); // ✅ Run immediately on load
     }
 
-    // Initialize existing blocks
+    // ✅ Initialize all existing blocks
     document.querySelectorAll(".form-block").forEach(initializeBlock);
 
     addMoreBtn.addEventListener("click", function () {
       const currentCount = parseInt(totalForms.value);
       const newBlock = formsetContainer.children[0].cloneNode(true);
 
-      // Update form index in HTML
       newBlock.innerHTML = newBlock.innerHTML.replace(/form-(\d+)/g, `form-${currentCount}`);
       formsetContainer.appendChild(newBlock);
       totalForms.value = currentCount + 1;
 
-      initializeBlock(newBlock);
+      initializeBlock(newBlock); // ✅ Initialize new block
     });
   });
 </script>

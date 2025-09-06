@@ -1,5 +1,8 @@
 from django.urls import path
+from . import views
 from django.contrib.auth import views as auth_views
+from .views import goodbye_view
+from django.contrib.auth.views import LogoutView
 from .views import (
     home_view,
     signup_view,
@@ -14,5 +17,6 @@ urlpatterns = [
     path('signup/', signup_view, name='signup'),
     path('onboarding/', onboarding_view, name='onboarding'),
     path('make_time_for/', make_time_for_view, name='make_time_for'),
-    path('schedule/', schedule_demo_view, name='schedule_demo'),
+    path('schedule/', views.schedule_demo_view, name='schedule_demo'),
+    path('goodbye/', goodbye_view, name='goodbye'),
 ]
